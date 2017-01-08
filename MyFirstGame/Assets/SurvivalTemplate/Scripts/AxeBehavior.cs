@@ -22,11 +22,11 @@ public class AxeBehavior : MonoBehaviour
     {
         if (CharacterIsSwinging())
         {
-            AxeAnimator.SetBool("CharacterIsSwinging", CharacterIsSwinging());
+            AxeAnimator.SetBool("CharacterIsSwinging", true);
         }
         else
         {
-            AxeAnimator.SetBool("CharacterIsSwinging", CharacterIsSwinging());
+            AxeAnimator.SetBool("CharacterIsSwinging", false);
             AxeAnimator.SetBool("CharacterIsMoving", CharacterIsMoving());
         }
     }
