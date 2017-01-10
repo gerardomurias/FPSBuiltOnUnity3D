@@ -4,15 +4,37 @@ using System.Collections;
 
 public class AxeBehavior : MonoBehaviour
 {
-    public Animator AxeAnimator { get; set; }
+    [SerializeField]
+    private Animator _axeAnimator;
 
-    // Use this for initialization
+    [SerializeField]
+    private Animation _axeAnimation;
+
+    private float _averageSpeed = 1.0f;
+    private float _doubleSpeed = 1.5f;
+
+
+    public Animator AxeAnimator
+    {
+        get { return _axeAnimator; }
+        set { _axeAnimator = value; }
+    }
+
+    public Animation AxeAnimation
+    {
+        get { return _axeAnimation; }
+        set { _axeAnimation = value; }
+    }
+
+    public PlayerBehavior Player { get; set; }
+
     void Start()
     {
         AxeAnimator = GetComponent<Animator>();
+        Player = GetComponent<PlayerBehavior>();
+        AxeAnimation = GetComponent<Animation>();
     }
 
-    // Update is called once per frame
     void Update()
     {
         SetAnimator();
@@ -20,31 +42,23 @@ public class AxeBehavior : MonoBehaviour
 
     private void SetAnimator()
     {
-        if (CharacterIsSwinging())
+        if (Player.IsSwinging())
         {
             AxeAnimator.SetBool("CharacterIsSwinging", true);
         }
         else
         {
             AxeAnimator.SetBool("CharacterIsSwinging", false);
-            AxeAnimator.SetBool("CharacterIsMoving", CharacterIsMoving());
+            AxeAnimator.SetBool("CharacterIsMoving", Player.IsMoving());
         }
-    }
 
-    private bool CharacterIsSwinging()
-    {
-        return Input.GetMouseButton(0);
-    }
-
-    private bool CharacterIsMoving()
-    {
-        return ((Input.GetKey("left")) ||
-                ((Input.GetKey("right"))) ||
-                ((Input.GetKey("up"))) ||
-                ((Input.GetKey("down"))) ||
-                ((Input.GetKey("w"))) ||
-                ((Input.GetKey("s"))) ||
-                ((Input.GetKey("a"))) ||
-                ((Input.GetKey("d"))));
+        if (Player.IsRunning())
+        {
+            AxeAnimator.SetFloat("AnimationSpeed", _doubleSpeed);
+        }
+        else
+        {
+            AxeAnimator.SetFloat("AnimationSpeed", _averageSpeed);
+        }
     }
 }
