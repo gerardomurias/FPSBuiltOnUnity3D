@@ -1,36 +1,21 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using System.Collections;
+using System.Linq;
 
 public class PlayerBehavior : MonoBehaviour
 {
-    //[SerializeField]
-    //private float _xAxis;
+    public Transform AttackPoint;
 
-    //[SerializeField]
-    //private float _yAxis;
-
-    //public float XAxis
-    //{
-    //    get { return _xAxis; }
-    //    set { _xAxis = value; }
-    //}
-
-    //public float YAxis
-    //{
-    //    get { return _yAxis; }
-    //    set { _yAxis = value; }
-    //} 
-
-    // Use this for initialization
     void Start()
     {
-
+        AttackPoint = GetComponent<Transform>();
     }
 
     // Update is called once per frame
     void Update()
     {
-
+        
     }
 
     public bool IsSwinging()
@@ -53,5 +38,23 @@ public class PlayerBehavior : MonoBehaviour
     public bool IsRunning()
     {
         return IsMoving() && (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift));
+    }
+
+    public void Attack()
+    {
+        var hits = Physics.OverlapSphere(AttackPoint.position, 0.4f);
+
+        foreach (var hitable in hits.Select(hit => hit.GetComponents(typeof (IHittable))))
+        {
+            if (hitable == null)
+            {
+                return;
+            }
+
+            foreach (IHittable component in hitable)
+            {
+                component.Hit();
+            }
+        }
     }
 }

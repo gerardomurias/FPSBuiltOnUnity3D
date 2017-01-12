@@ -10,9 +10,8 @@ public class AxeBehavior : MonoBehaviour
     [SerializeField]
     private Animation _axeAnimation;
 
-    private float _averageSpeed = 1.0f;
-    private float _doubleSpeed = 1.5f;
-
+    private const float _averageSpeed = 1.0f;
+    private const float _doubleSpeed = 1.5f;
 
     public Animator AxeAnimator
     {
@@ -52,13 +51,6 @@ public class AxeBehavior : MonoBehaviour
             AxeAnimator.SetBool("CharacterIsMoving", Player.IsMoving());
         }
 
-        if (Player.IsRunning())
-        {
-            AxeAnimator.SetFloat("AnimationSpeed", _doubleSpeed);
-        }
-        else
-        {
-            AxeAnimator.SetFloat("AnimationSpeed", _averageSpeed);
-        }
+        AxeAnimator.SetFloat("AnimationSpeed", Player.IsRunning() ? _doubleSpeed : _averageSpeed);
     }
 }
