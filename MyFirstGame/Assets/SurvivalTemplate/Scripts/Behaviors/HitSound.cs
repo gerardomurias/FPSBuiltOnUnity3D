@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-[RequireComponent(typeof(AudioClip), typeof(AudioSource))]
+[RequireComponent(typeof(AudioSource))]
 public class HitSound : MonoBehaviour, IHittable
 {
     [HideInInspector]
@@ -33,7 +33,5 @@ public class HitSound : MonoBehaviour, IHittable
     public void Hit()
     {
         AudioSource.PlayOneShot(AudioClip);
-
-        Debug.Log("Gotcha!");
     }
 }
