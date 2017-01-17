@@ -42,7 +42,7 @@ public class PlayerBehavior : MonoBehaviour
 
     public void Attack()
     {
-        var hits = Physics.OverlapSphere(AttackPoint.position, 0.4f);
+        var hits = Physics.OverlapSphere(AttackPoint.position, 0.8f);
 
         foreach (var hitable in hits.Select(hit => hit.GetComponents(typeof (IHittable))))
         {
