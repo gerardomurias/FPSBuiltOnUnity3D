@@ -2,8 +2,9 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
-[RequireComponent(typeof(Stats),typeof(AudioSource))]
+[RequireComponent(typeof(Stats),typeof(AudioSource), typeof(Animation))]
 public class EnemyBehavior : MonoBehaviour, IHittable, IDie
 {
     [SerializeField]
@@ -21,6 +22,13 @@ public class EnemyBehavior : MonoBehaviour, IHittable, IDie
     [SerializeField]
     private AudioClip _deadAudioClip;
 
+    [SerializeField]
+    private Animation _deathAnimation;
+
+    [SerializeField]
+    private AIPath _aiPath;
+
+
 
     public Stats EnemyStats
     {
@@ -34,10 +42,40 @@ public class EnemyBehavior : MonoBehaviour, IHittable, IDie
         set { _audioSources = value; }
     }
 
+    public Animation DeathAnimation
+    {
+        get { return _deathAnimation; }
+        set { _deathAnimation = value; }
+    }
+
+    public AIPath AiPath
+    {
+        get { return _aiPath; }
+        set { _aiPath = value; }
+    }
+
+
     void Start()
     {
         InitializeEnemyStats();
         InitializeAudioSource();
+        InitializeAnimations();
+        InitalizePathFinding();
+    }
+
+    private void InitalizePathFinding()
+    {
+        AiPath = GetComponent<AIPath>();
+    }
+
+    private void InitializeAnimations()
+    {
+        DeathAnimation = GetComponent<Animation>();
+
+        if (DeathAnimation == null)
+        {
+            throw new MissingComponentException("DeathAnimation component missing in Enemy Class");
+        }
     }
 
     private void InitializeAudioSource()
@@ -79,7 +117,19 @@ public class EnemyBehavior : MonoBehaviour, IHittable, IDie
 
     public void Die()
     {
-        AudioSources[1].PlayOneShot(_deadAudioClip);
+        PlayDeath();
+        DestroyEnemyGameObject();
+    }
+
+    private void DestroyEnemyGameObject()
+    {
         Destroy(gameObject, _deadAudioClip.length);
+    }
+
+    private void PlayDeath()
+    {
+        AudioSources[1].PlayOneShot(_deadAudioClip);
+        AiPath.canMove = false;
+        DeathAnimation.CrossFade("death1");
     }
 }
