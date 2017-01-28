@@ -10,8 +10,12 @@ public class AxeBehavior : MonoBehaviour
     [SerializeField]
     private Animation _axeAnimation;
 
+
+
     private const float _averageSpeed = 1.0f;
     private const float _doubleSpeed = 1.5f;
+
+
 
     public Animator AxeAnimator
     {

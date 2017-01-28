@@ -3,9 +3,10 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Assets.SurvivalTemplate.Scripts.Contracts;
 
 [RequireComponent(typeof(Stats),typeof(AudioSource), typeof(Animation))]
-public class EnemyBehavior : MonoBehaviour, IHittable, IDie
+public class EnemyBehavior : MonoBehaviour, IHittable, IBleed, IDie
 {
     [SerializeField]
     private Stats _enemyStats;
@@ -27,6 +28,9 @@ public class EnemyBehavior : MonoBehaviour, IHittable, IDie
 
     [SerializeField]
     private AIPath _aiPath;
+
+    [SerializeField]
+    private ParticleSystem _particleSystem;
 
 
 
@@ -52,6 +56,12 @@ public class EnemyBehavior : MonoBehaviour, IHittable, IDie
     {
         get { return _aiPath; }
         set { _aiPath = value; }
+    }
+
+    public ParticleSystem ParticleSystem
+    {
+        get { return _particleSystem; }
+        set { _particleSystem = value; }
     }
 
 
@@ -105,6 +115,8 @@ public class EnemyBehavior : MonoBehaviour, IHittable, IDie
     {
         EnemyStats.Health -= 10;
 
+        Bleed();
+
         if (EnemyStats.Health <= 0)
         {
             Die();
@@ -131,5 +143,10 @@ public class EnemyBehavior : MonoBehaviour, IHittable, IDie
         AudioSources[1].PlayOneShot(_deadAudioClip);
         AiPath.canMove = false;
         DeathAnimation.CrossFade("death1");
+    }
+
+    public void Bleed()
+    {
+        ParticleSystem.Play();
     }
 }

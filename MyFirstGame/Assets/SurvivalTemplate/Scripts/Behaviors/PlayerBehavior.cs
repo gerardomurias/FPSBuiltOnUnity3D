@@ -7,6 +7,8 @@ public class PlayerBehavior : MonoBehaviour
 {
     public Transform AttackPoint;
 
+
+
     void Start()
     {
         AttackPoint = GetComponent<Transform>();
