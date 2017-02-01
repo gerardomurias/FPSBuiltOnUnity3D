@@ -32,7 +32,11 @@ public class EnemyBehavior : MonoBehaviour, IHittable, IBleed, IDie
     [SerializeField]
     private ParticleSystem _particleSystem;
 
+    [SerializeField]
+    [HideInInspector]
+    private Action _hasDiedAction;
 
+    
 
     public Stats EnemyStats
     {
@@ -63,6 +67,13 @@ public class EnemyBehavior : MonoBehaviour, IHittable, IBleed, IDie
         get { return _particleSystem; }
         set { _particleSystem = value; }
     }
+    
+    public Action HasDiedAction
+    {
+        get { return _hasDiedAction; }
+        set { _hasDiedAction = value; }
+    }
+
 
 
     void Start()
@@ -130,7 +141,16 @@ public class EnemyBehavior : MonoBehaviour, IHittable, IBleed, IDie
     public void Die()
     {
         PlayDeath();
+        BroadcastMessageToSpawner();
         DestroyEnemyGameObject();
+    }
+
+    private void BroadcastMessageToSpawner()
+    {
+        if (HasDiedAction != null)
+        {
+            HasDiedAction();
+        }
     }
 
     private void DestroyEnemyGameObject()
