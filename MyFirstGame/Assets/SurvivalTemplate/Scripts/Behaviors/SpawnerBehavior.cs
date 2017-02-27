@@ -58,6 +58,7 @@ public class SpawnerBehavior : MonoBehaviour
         if (_currentWaveCount <= 0)
         {
             Invoke("SpawnLoop", _spawnDelay);
+            _currentWaveCount++;
         }
     }
 
