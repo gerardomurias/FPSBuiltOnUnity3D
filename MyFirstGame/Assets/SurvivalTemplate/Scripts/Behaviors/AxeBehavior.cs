@@ -1,19 +1,24 @@
 ﻿using System;
 using UnityEngine;
 using System.Collections;
+using System.Linq;
 
-public class AxeBehavior : MonoBehaviour
+public class AxeBehavior : MonoBehaviour, IAttack
 {
+    private const float _averageSpeed = 1.0f;
+
+    private const float _doubleSpeed = 1.5f;
+
     [SerializeField]
     private Animator _axeAnimator;
 
     [SerializeField]
     private Animation _axeAnimation;
 
+    [SerializeField]
+    public PlayerBehavior _player;
 
-
-    private const float _averageSpeed = 1.0f;
-    private const float _doubleSpeed = 1.5f;
+    public Transform AttackPoint;
 
 
 
@@ -29,13 +34,48 @@ public class AxeBehavior : MonoBehaviour
         set { _axeAnimation = value; }
     }
 
-    public PlayerBehavior Player { get; set; }
+    public PlayerBehavior Player
+    {
+        get { return _player; }
+        set { _player = value; }
+    }
+
+
+
+    public void Attack()
+    {
+        var hits = Physics.OverlapSphere(AttackPoint.position, 0.8f);
+
+        foreach (var hitable in hits.Select(hit => hit.GetComponents(typeof(IHittable))))
+        {
+            if (hitable == null)
+            {
+                return;
+            }
+
+            foreach (IHittable component in hitable)
+            {
+                component.Hit();
+            }
+        }
+    }
 
     void Start()
     {
         AxeAnimator = GetComponent<Animator>();
-        Player = GetComponent<PlayerBehavior>();
+        AttackPoint = GetComponent<Transform>();
         AxeAnimation = GetComponent<Animation>();
+        //Player = GetComponent<PlayerBehavior>();
+
+        CheckNullComponents();
+    }
+
+    private void CheckNullComponents()
+    {
+        if ((AxeAnimator == null) || (AttackPoint == null) || (Player == null) || (AxeAnimation ==null))
+        {
+            throw new MissingComponentException("Missing components on AxeBehavior");
+        }
     }
 
     void Update()

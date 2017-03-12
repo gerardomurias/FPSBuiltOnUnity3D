@@ -3,21 +3,36 @@ using UnityEngine;
 using System.Collections;
 using System.Linq;
 
-public class PlayerBehavior : MonoBehaviour
+public class PlayerBehavior : MonoBehaviour, IHittable, IDie
 {
-    public Transform AttackPoint;
+    [HideInInspector]
+    [SerializeField]
+    private Stats _playerStats;
+
+    
+
+    public Stats PlayerStats
+    {
+        get { return _playerStats; }
+        set { _playerStats = value; }
+    }
+
+    public Action HasDiedAction { get; set; }
 
 
 
     void Start()
     {
-        AttackPoint = GetComponent<Transform>();
+        PlayerStats = GetComponent<Stats>();
+        if (PlayerStats == null)
+        {
+            throw new MissingComponentException("Missing Player Stats");
+        }
     }
 
-    // Update is called once per frame
     void Update()
     {
-        
+
     }
 
     public bool IsSwinging()
@@ -42,21 +57,21 @@ public class PlayerBehavior : MonoBehaviour
         return IsMoving() && (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift));
     }
 
-    public void Attack()
+    
+
+    public void Hit()
     {
-        var hits = Physics.OverlapSphere(AttackPoint.position, 0.8f);
+        PlayerStats.Health -= 10;
 
-        foreach (var hitable in hits.Select(hit => hit.GetComponents(typeof (IHittable))))
+        if (PlayerStats.Health <= 0)
         {
-            if (hitable == null)
-            {
-                return;
-            }
-
-            foreach (IHittable component in hitable)
-            {
-                component.Hit();
-            }
+            Die();
         }
+    }
+
+    public void Die()
+    {
+
+
     }
 }

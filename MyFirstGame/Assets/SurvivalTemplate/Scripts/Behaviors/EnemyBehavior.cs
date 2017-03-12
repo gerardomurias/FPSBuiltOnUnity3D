@@ -3,7 +3,6 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Assets.SurvivalTemplate.Scripts.Contracts;
 
 [RequireComponent(typeof(Stats),typeof(AudioSource), typeof(Animation))]
 public class EnemyBehavior : MonoBehaviour, IHittable, IBleed, IDie

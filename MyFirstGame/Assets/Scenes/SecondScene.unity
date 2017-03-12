@@ -11006,7 +11006,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5e4c02a1075a9bb4a9c4880274dac89a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  AttackPoint: {fileID: 0}
+  _playerStats: {fileID: 0}
+--- !u!114 &801517002
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 801516996}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 02fd7bb06708e384f9094a2e8e6da765, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _health: 100
 --- !u!1 &811079693 stripped
 GameObject:
   m_PrefabParentObject: {fileID: 100000, guid: a3170992a56741a4cb89c578e22597bf, type: 2}
@@ -28693,7 +28705,6 @@ GameObject:
   - component: {fileID: 1809561713}
   - component: {fileID: 1809561714}
   - component: {fileID: 1809561715}
-  - component: {fileID: 1809561716}
   m_Layer: 0
   m_Name: hacha_malla_base_triangulada
   m_TagString: Untagged
@@ -28801,17 +28812,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _axeAnimator: {fileID: 0}
   _axeAnimation: {fileID: 0}
---- !u!114 &1809561716
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1809561709}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5e4c02a1075a9bb4a9c4880274dac89a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  _player: {fileID: 801517001}
   AttackPoint: {fileID: 0}
 --- !u!1001 &1814152515
 Prefab:

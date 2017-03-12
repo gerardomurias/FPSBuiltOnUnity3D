@@ -16,7 +16,7 @@ public class SpawnerBehavior : MonoBehaviour
 
     private int _currentWaveCount;
 
-    private int _currentWave = 1;
+    private int _currentWave = 0;
 
     private Action _hasDied;
 
@@ -59,12 +59,13 @@ public class SpawnerBehavior : MonoBehaviour
         {
             Invoke("SpawnLoop", _spawnDelay);
             _currentWaveCount++;
+            _currentWave++;
         }
     }
 
     private void SpawnLoop()
     {
-        _currentWaveCount = _currentWave * 5;
+        _currentWaveCount = _currentWave + 5;
 
         for (int i = 0; i < _currentWaveCount; i++)
         {
