@@ -3,14 +3,14 @@ using UnityEngine;
 using System.Collections;
 using System.Linq;
 
-public class PlayerBehavior : MonoBehaviour, IHittable, IDie
+public class PlayerBehavior : MonoBehaviour, IHittable, IDie, IBleed
 {
     [HideInInspector]
     [SerializeField]
     private Stats _playerStats;
 
+    public ParticleSystem ParticleSystem { get; set; }
     
-
     public Stats PlayerStats
     {
         get { return _playerStats; }
@@ -57,10 +57,9 @@ public class PlayerBehavior : MonoBehaviour, IHittable, IDie
         return IsMoving() && (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift));
     }
 
-    
-
     public void Hit()
     {
+        Debug.Log("player has been hit");
         PlayerStats.Health -= 10;
 
         if (PlayerStats.Health <= 0)
@@ -73,5 +72,10 @@ public class PlayerBehavior : MonoBehaviour, IHittable, IDie
     {
 
 
+    }
+
+    public void Bleed()
+    {
+        throw new NotImplementedException();
     }
 }

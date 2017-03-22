@@ -3,9 +3,10 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 
-[RequireComponent(typeof(Stats),typeof(AudioSource), typeof(Animation))]
-public class EnemyBehavior : MonoBehaviour, IHittable, IBleed, IDie
+[RequireComponent(typeof(Stats), typeof(AudioSource), typeof(Animation))]
+public class EnemyBehavior : MonoBehaviour, IHittable, IBleed, IDie, IAutomaticAttacker
 {
     [SerializeField]
     private Stats _enemyStats;
@@ -35,7 +36,15 @@ public class EnemyBehavior : MonoBehaviour, IHittable, IBleed, IDie
     [HideInInspector]
     private Action _hasDiedAction;
 
-    
+    [SerializeField]
+    private GameObject _playerReference;
+
+    [SerializeField]
+    private Transform _attackPoint;
+
+    private float _attackRange = 1.2f;
+
+
 
     public Stats EnemyStats
     {
@@ -66,11 +75,23 @@ public class EnemyBehavior : MonoBehaviour, IHittable, IBleed, IDie
         get { return _particleSystem; }
         set { _particleSystem = value; }
     }
-    
+
     public Action HasDiedAction
     {
         get { return _hasDiedAction; }
         set { _hasDiedAction = value; }
+    }
+
+    public GameObject PlayerReference
+    {
+        get { return _playerReference; }
+        set { _playerReference = value; }
+    }
+
+    public Transform AttackPoint
+    {
+        get { return _attackPoint; }
+        set { _attackPoint = value; }
     }
 
 
@@ -78,9 +99,28 @@ public class EnemyBehavior : MonoBehaviour, IHittable, IBleed, IDie
     void Start()
     {
         InitializeEnemyStats();
+        InitializePosition();
         InitializeAudioSource();
         InitializeAnimations();
         InitalizePathFinding();
+        InitializeExternReferences();
+    }
+
+    void Update()
+    {
+        CheckDistanceWithObjetive();
+    }
+
+    private void InitializePosition()
+    {
+        AttackPoint = GetComponent<Transform>();
+    }
+
+    private void InitializeExternReferences()
+    {
+        PlayerReference = GameObject.Find("Player");
+
+        if (PlayerReference == null) { throw new MissingComponentException("EnemyBehavior: Missing Player reference"); }
     }
 
     private void InitalizePathFinding()
@@ -116,11 +156,6 @@ public class EnemyBehavior : MonoBehaviour, IHittable, IBleed, IDie
         }
     }
 
-    void Update()
-    {
-
-    }
-
     public void Hit()
     {
         EnemyStats.Health -= 10;
@@ -133,7 +168,7 @@ public class EnemyBehavior : MonoBehaviour, IHittable, IBleed, IDie
         }
         else
         {
-            AudioSources[0].PlayOneShot(_woundedAudioClip);    
+            AudioSources[0].PlayOneShot(_woundedAudioClip);
         }
     }
 
@@ -167,5 +202,24 @@ public class EnemyBehavior : MonoBehaviour, IHittable, IBleed, IDie
     public void Bleed()
     {
         ParticleSystem.Play();
+    }
+
+    public void CheckDistanceWithObjetive()
+    {
+        if (CanAttack())
+        {
+            Attack();
+        }
+    }
+
+    public void Attack()
+    {
+        var hittableComponent = PlayerReference.GetComponent<IHittable>(); 
+        hittableComponent.Hit();
+    }
+
+    public bool CanAttack()
+    {
+        return (Vector3.Distance(PlayerReference.transform.position, transform.position) < _attackRange);
     }
 }

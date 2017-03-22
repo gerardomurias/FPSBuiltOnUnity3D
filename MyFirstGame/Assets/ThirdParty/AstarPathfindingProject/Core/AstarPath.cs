@@ -153,7 +153,7 @@ public class AstarPath : MonoBehaviour {
 	 * Use more debugging (heavy) if you want more information about what the pathfinding is doing.\n
 	 * InGame will display the latest path log using in game GUI.
 	 */
-	public PathLog logPathResults = PathLog.Normal;
+	public PathLog logPathResults = PathLog.None;
 
 	/** @} */
 	#endregion
@@ -838,18 +838,20 @@ public class AstarPath : MonoBehaviour {
 	 * \see PathLog
 	 * \see Pathfinding.Path.DebugString
 	 */
-	private void LogPathResults (Path p) {
-		if (logPathResults == PathLog.None || (logPathResults == PathLog.OnlyErrors && !p.error)) {
-			return;
-		}
+	private void LogPathResults (Path p)
+	{
+	    logPathResults = PathLog.None;
+	    //if (logPathResults == PathLog.None || (logPathResults == PathLog.OnlyErrors && !p.error)) {
+	    //	return;
+	    //}
 
-		string debug = p.DebugString(logPathResults);
+	    //string debug = p.DebugString(logPathResults);
 
-		if (logPathResults == PathLog.InGame) {
-			inGameDebugPath = debug;
-		} else {
-			Debug.Log(debug);
-		}
+	    //if (logPathResults == PathLog.InGame) {
+	    //	inGameDebugPath = debug;
+	    //} else {
+	    //	Debug.Log(debug);
+	    //}
 	}
 
 

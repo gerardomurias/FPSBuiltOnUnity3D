@@ -3,7 +3,7 @@ using UnityEngine;
 using System.Collections;
 using System.Linq;
 
-public class AxeBehavior : MonoBehaviour, IAttack
+public class AxeBehavior : MonoBehaviour, IAttacker
 {
     private const float _averageSpeed = 1.0f;
 
@@ -40,8 +40,6 @@ public class AxeBehavior : MonoBehaviour, IAttack
         set { _player = value; }
     }
 
-
-
     public void Attack()
     {
         var hits = Physics.OverlapSphere(AttackPoint.position, 0.8f);
@@ -65,7 +63,6 @@ public class AxeBehavior : MonoBehaviour, IAttack
         AxeAnimator = GetComponent<Animator>();
         AttackPoint = GetComponent<Transform>();
         AxeAnimation = GetComponent<Animation>();
-        //Player = GetComponent<PlayerBehavior>();
 
         CheckNullComponents();
     }

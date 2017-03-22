@@ -587,6 +587,7 @@ namespace Pathfinding {
 		 * \see DebugString
 		 */
 		protected void DebugStringPrefix (PathLog logMode, System.Text.StringBuilder text) {
+            Debug.Log("logmode is " + logMode.ToString());
 			text.Append(error ? "Path Failed : " : "Path Completed : ");
 			text.Append("Computation Time ");
 			text.Append(duration.ToString(logMode == PathLog.Heavy ? "0.000 ms " : "0.00 ms "));
