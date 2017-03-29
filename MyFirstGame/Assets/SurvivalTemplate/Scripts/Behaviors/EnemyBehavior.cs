@@ -42,7 +42,13 @@ public class EnemyBehavior : MonoBehaviour, IHittable, IBleed, IDie, IAutomaticA
     [SerializeField]
     private Transform _attackPoint;
 
+    [SerializeField]
+    [HideInInspector]
+    private bool _isCharging;
+
     private float _attackRange = 1.2f;
+
+    private float _attackDelay = 2;
 
 
 
@@ -94,10 +100,18 @@ public class EnemyBehavior : MonoBehaviour, IHittable, IBleed, IDie, IAutomaticA
         set { _attackPoint = value; }
     }
 
+    public bool IsCharging
+    {
+        get { return _isCharging; }
+        set { _isCharging = value; }
+    }
+
 
 
     void Start()
     {
+        IsCharging = false;
+
         InitializeEnemyStats();
         InitializePosition();
         InitializeAudioSource();
@@ -208,17 +222,25 @@ public class EnemyBehavior : MonoBehaviour, IHittable, IBleed, IDie, IAutomaticA
     {
         if (CanAttack())
         {
-            Attack();
+            Invoke("Attack", _attackDelay);
+            IsCharging = true;
         }
     }
 
     public void Attack()
     {
-        var hittableComponent = PlayerReference.GetComponent<IHittable>(); 
+        var hittableComponent = PlayerReference.GetComponent<IHittable>();
         hittableComponent.Hit();
+
+        IsCharging = false;
     }
 
     public bool CanAttack()
+    {
+        return (IsClose() && (!IsCharging));
+    }
+
+    private bool IsClose()
     {
         return (Vector3.Distance(PlayerReference.transform.position, transform.position) < _attackRange);
     }

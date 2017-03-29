@@ -22,6 +22,20 @@ public class AxeBehavior : MonoBehaviour, IAttacker
 
 
 
+    void Update()
+    {
+        SetAnimator();
+    }
+
+    void Start()
+    {
+        AxeAnimator = GetComponent<Animator>();
+        AttackPoint = GetComponent<Transform>();
+        AxeAnimation = GetComponent<Animation>();
+
+        CheckNullComponents();
+    }
+
     public Animator AxeAnimator
     {
         get { return _axeAnimator; }
@@ -42,29 +56,15 @@ public class AxeBehavior : MonoBehaviour, IAttacker
 
     public void Attack()
     {
-        var hits = Physics.OverlapSphere(AttackPoint.position, 0.8f);
+        var hits = Physics.OverlapSphere(AttackPoint.position, 0.8f).Where(x => x.gameObject.name.Contains("Spider"));
 
-        foreach (var hitable in hits.Select(hit => hit.GetComponents(typeof(IHittable))))
+        if (hits.Any())
         {
-            if (hitable == null)
+            foreach (IHittable hitable in hits.Select(x => x.GetComponents(typeof(IHittable))).First())
             {
-                return;
-            }
-
-            foreach (IHittable component in hitable)
-            {
-                component.Hit();
+                hitable.Hit();
             }
         }
-    }
-
-    void Start()
-    {
-        AxeAnimator = GetComponent<Animator>();
-        AttackPoint = GetComponent<Transform>();
-        AxeAnimation = GetComponent<Animation>();
-
-        CheckNullComponents();
     }
 
     private void CheckNullComponents()
@@ -73,11 +73,6 @@ public class AxeBehavior : MonoBehaviour, IAttacker
         {
             throw new MissingComponentException("Missing components on AxeBehavior");
         }
-    }
-
-    void Update()
-    {
-        SetAnimator();
     }
 
     private void SetAnimator()
