@@ -2,6 +2,7 @@
 using UnityEngine;
 using System.Collections;
 using System.Linq;
+using UnityEngine.SceneManagement;
 
 [RequireComponent(typeof(AudioSource))]
 public class PlayerBehavior : MonoBehaviour, IHittable, IDie, IBleed
@@ -125,7 +126,8 @@ public class PlayerBehavior : MonoBehaviour, IHittable, IDie, IBleed
 
     public void Die()
     {
-        
+        Debug.Log("Game Over");
+        SceneManager.LoadSceneAsync("GameOver", LoadSceneMode.Single);
     }
 
     public void Bleed()
