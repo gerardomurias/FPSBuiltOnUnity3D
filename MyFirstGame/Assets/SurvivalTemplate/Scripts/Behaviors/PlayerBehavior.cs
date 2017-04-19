@@ -101,7 +101,6 @@ public class PlayerBehavior : MonoBehaviour, IHittable, IDie, IBleed
 
     public void Hit()
     {
-        Debug.Log("player has been hit");
         PlayerStats.Health -= 10;
 
         if (PlayerStats.Health <= 0)
@@ -126,7 +125,6 @@ public class PlayerBehavior : MonoBehaviour, IHittable, IDie, IBleed
 
     public void Die()
     {
-        Debug.Log("Game Over");
         SceneManager.LoadSceneAsync("GameOver", LoadSceneMode.Single);
     }
 
