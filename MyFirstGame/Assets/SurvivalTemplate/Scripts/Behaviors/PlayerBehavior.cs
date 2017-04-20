@@ -22,6 +22,8 @@ public class PlayerBehavior : MonoBehaviour, IHittable, IDie, IBleed
     [SerializeField]
     private AudioClip _deadAudioClip;
 
+
+
     public ParticleSystem ParticleSystem { get; set; }
 
     public Stats PlayerStats
