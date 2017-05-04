@@ -5,6 +5,6 @@ public class GameOverButtonBehavior : MonoBehaviour
 {
     public void Click()
     {
-        SceneManager.LoadSceneAsync("SecondScene", LoadSceneMode.Single);
+        SceneManager.LoadSceneAsync("GameScene", LoadSceneMode.Single);
     }
 }

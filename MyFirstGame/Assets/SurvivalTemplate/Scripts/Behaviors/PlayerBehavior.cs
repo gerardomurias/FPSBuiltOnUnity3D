@@ -22,6 +22,10 @@ public class PlayerBehavior : MonoBehaviour, IHittable, IDie, IBleed
     [SerializeField]
     private AudioClip _deadAudioClip;
 
+    [HideInInspector]
+    [SerializeField]
+    private Action _hasTakenDamageAction;
+
 
 
     public ParticleSystem ParticleSystem { get; set; }
@@ -33,6 +37,12 @@ public class PlayerBehavior : MonoBehaviour, IHittable, IDie, IBleed
     }
 
     public Action HasDiedAction { get; set; }
+
+    public Action HasTakenDamageAction
+    {
+        get { return _hasTakenDamageAction; }
+        set { _hasTakenDamageAction = value; }
+    }
 
     public AudioSource[] AudioSources
     {
@@ -74,9 +84,7 @@ public class PlayerBehavior : MonoBehaviour, IHittable, IDie, IBleed
     {
         PlayerStats = GetComponent<Stats>();
         if (PlayerStats == null)
-        {
-            throw new MissingComponentException("Missing Player Stats");
-        }
+        { throw new MissingComponentException("Missing Player Stats"); }
     }
 
     public bool IsSwinging()
@@ -104,13 +112,16 @@ public class PlayerBehavior : MonoBehaviour, IHittable, IDie, IBleed
     public void Hit()
     {
         PlayerStats.Health -= 10;
-
+        
         if (PlayerStats.Health <= 0)
         {
             Die();
         }
 
         PlaySound();
+
+        if (HasTakenDamageAction != null)
+        { HasTakenDamageAction(); }
     }
 
     private void PlaySound()
