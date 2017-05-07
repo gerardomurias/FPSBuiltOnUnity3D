@@ -26,6 +26,10 @@ public class PlayerBehavior : MonoBehaviour, IHittable, IDie, IBleed
     [SerializeField]
     private Action _hasTakenDamageAction;
 
+    [HideInInspector]
+    [SerializeField]
+    private EnemyBehavior _enemyReference;
+
 
 
     public ParticleSystem ParticleSystem { get; set; }
@@ -50,6 +54,12 @@ public class PlayerBehavior : MonoBehaviour, IHittable, IDie, IBleed
         set { _audioSources = value; }
     }
 
+    public EnemyBehavior EnemyReference
+    {
+        get { return _enemyReference; }
+        set { _enemyReference = value; }
+    }
+
 
 
     void Start()
@@ -66,6 +76,21 @@ public class PlayerBehavior : MonoBehaviour, IHittable, IDie, IBleed
     {
         InitializeStats();
         InitializeAudioSources();
+        InitializeEnemiesReference();
+    }
+
+    private void InitializeEnemiesReference()
+    {
+        if (GameObject.FindGameObjectWithTag("Spider") == null)
+        {
+            throw new MissingComponentException("No Enemies Located");
+        }
+
+        EnemyReference = GameObject.FindGameObjectWithTag("Spider").GetComponent<EnemyBehavior>();
+        if (EnemyReference == null)
+        {
+            throw new MissingComponentException("No Enemies Located");
+        }
     }
 
     private void InitializeAudioSources()
@@ -111,7 +136,7 @@ public class PlayerBehavior : MonoBehaviour, IHittable, IDie, IBleed
 
     public void Hit()
     {
-        PlayerStats.Health -= 10;
+        PlayerStats.Health -= EnemyReference.DamagePerAttack;
         
         if (PlayerStats.Health <= 0)
         {

@@ -46,10 +46,13 @@ public class EnemyBehavior : MonoBehaviour, IHittable, IBleed, IDie, IAutomaticA
     [HideInInspector]
     private bool _isCharging;
 
-    private float _attackRange = 1.2f;
+    private const float _attackRange = 1.2f;
 
-    private float _attackDelay = 2;
+    private const float _attackDelay = 2;
 
+    [SerializeField]
+    [HideInInspector]
+    private const int _DamagePerAttack = 10;
 
 
     public Stats EnemyStats
@@ -104,6 +107,11 @@ public class EnemyBehavior : MonoBehaviour, IHittable, IBleed, IDie, IAutomaticA
     {
         get { return _isCharging; }
         set { _isCharging = value; }
+    }
+
+    public int DamagePerAttack
+    {
+        get { return _DamagePerAttack; }
     }
 
 

@@ -7,13 +7,20 @@ public class HealthBarBehavior : MonoBehaviour
     [SerializeField]
     private Stats _playerStats;
 
+    [HideInInspector]
+    [SerializeField]
+    private UILabel _healthLabel;
+
     [SerializeField]
     private UISlider _progressBarReference;
 
     [SerializeField]
     private PlayerBehavior _playerReference;
 
-    
+    [HideInInspector]
+    [SerializeField]
+    private EnemyBehavior _enemyReference;
+
 
 
     public Stats PlayerStatsReference
@@ -34,11 +41,25 @@ public class HealthBarBehavior : MonoBehaviour
         set { _playerReference = value; }
     }
 
+    public UILabel HealthLabel
+    {
+        get { return _healthLabel; }
+        set { _healthLabel = value; }
+    }
+
+    public EnemyBehavior EnemyReference
+    {
+        get { return _enemyReference; }
+        set { _enemyReference = value; }
+    }
+
 
 
     void Start()
     {
         InitializeReferences();
+
+        HealthLabel.text = PlayerStatsReference.Health.ToString(System.Globalization.CultureInfo.InvariantCulture);
     }
 
     private void InitializeReferences()
@@ -61,11 +82,30 @@ public class HealthBarBehavior : MonoBehaviour
             throw new MissingComponentException("Missing Progress Bar");
         }
 
+        HealthLabel = GetComponentInChildren<UILabel>();
+        if (HealthLabel == null)
+        {
+            throw new MissingComponentException("Missing Health Label Reference");
+        }
+
+        EnemyReference = GameObject.Find("Spider").GetComponent<EnemyBehavior>();
+        if (EnemyReference == null)
+        {
+            throw new MissingComponentException("Missing Enemy Reference");
+        }
+
         PlayerReference.HasTakenDamageAction = PlayerHasTakenDamage;
     }
 
     void PlayerHasTakenDamage()
     {
         ProgressBarReference.sliderValue = PlayerStatsReference.Health / PlayerStatsReference.InitialMaxHealth;
+        UpdateHealthLabel();
+    }
+
+    private void UpdateHealthLabel()
+    {
+        //HealthLabel.text = (PlayerStatsReference.Health  - EnemyReference.DamagePerAttack).ToString(System.Globalization.CultureInfo.InvariantCulture);
+        HealthLabel.text = PlayerStatsReference.Health.ToString(System.Globalization.CultureInfo.InvariantCulture);
     }
 }
