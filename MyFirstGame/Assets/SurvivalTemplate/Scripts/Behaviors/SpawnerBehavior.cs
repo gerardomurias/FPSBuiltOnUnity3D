@@ -1,32 +1,37 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
 public class SpawnerBehavior : MonoBehaviour
 {
     [SerializeField]
-    private GameObject _enemySpider;
+    private GameObject _playerReference;
 
     [SerializeField]
-    private GameObject _playerReference;
+    private int _currentWaveCount;
+
+    [SerializeField]
+    private int _currentEnemiesLeftCount = 0;
+
+    [SerializeField]
+    private SpiderFactory _spiderFactoryReference;
 
     private float _spawnOffset = 3.0f;
 
     private float _spawnDelay = 5;
 
-    private int _currentWaveCount;
-
-    private int _currentWave = 0;
-
+    private int _enemiesIncrement = 1;
+    
     private Action _hasDied;
 
+    public Action UpdateEnemyCount;
+
+    public Action UpdateWaveCount;
+
+    internal List<GameObject> Enemies = new List<GameObject>();
 
 
-    public GameObject EnemySpider
-    {
-        get { return _enemySpider; }
-        set { _enemySpider = value; }
-    }
 
     public Vector3 RandomSpawnPoinTransform
     {
@@ -46,6 +51,24 @@ public class SpawnerBehavior : MonoBehaviour
         set { _playerReference = value; }
     }
 
+    public int CurrentWaveCount
+    {
+        get { return _currentWaveCount; }
+        set { _currentWaveCount = value; }
+    }
+
+    public int CurrentEnemiesLeftCount
+    {
+        get { return _currentEnemiesLeftCount; }
+        set { _currentEnemiesLeftCount = (value < 0) ? 0 : value; }
+    }
+
+    public SpiderFactory SpiderFactoryReference
+    {
+        get { return _spiderFactoryReference; }
+        set { _spiderFactoryReference = value; }
+    }
+
 
 
     void Start()
@@ -53,31 +76,53 @@ public class SpawnerBehavior : MonoBehaviour
         SpawnLoop();
     }
 
+    private void SpawnFirstSpider(GameObject enemySpider)
+    {
+        throw new NotImplementedException();
+    }
+
     void Update()
     {
-        if (_currentWaveCount <= 0)
-        {
-            Invoke("SpawnLoop", _spawnDelay);
-            _currentWaveCount++;
-            _currentWave++;
-        }
     }
 
     private void SpawnLoop()
     {
-        _currentWaveCount = _currentWave + 5;
+        //UpdateEnemiesCount();
 
-        for (int i = 0; i < _currentWaveCount; i++)
-        {
-            SpawnNewSpider();
-        }
+
+        //CurrentWaveCount++;
+        //if (UpdateWaveCount != null)
+        //{
+        //    UpdateWaveCount();
+        //}
+
+        //for (int i = 0; i < CurrentEnemiesLeftCount; i++)
+        //{
+        //    InstantiateNewSpider();
+        //}
     }
 
-    private void SpawnNewSpider()
+    private void UpdateEnemiesCount()
     {
-        var spider = Instantiate(EnemySpider, RandomSpawnPoinTransform, Quaternion.identity);
-        var enemyBehaviorComponent = spider.GetComponent<EnemyBehavior>();
+        _enemiesIncrement += 1;
+        CurrentEnemiesLeftCount = _enemiesIncrement;
+    }
+
+    //private void InstantiateNewSpider()
+    //{
+    //    var spider = Instantiate(EnemySpider, RandomSpawnPoinTransform, Quaternion.identity);
+    //    SpawnInstantiatedSpider(spider);
+    //}
+
+    private void SpawnInstantiatedSpider(GameObject spider)
+    {
+        var enemyBehaviorComponent = spider.GetComponent<SpiderBehavior>();
         enemyBehaviorComponent.HasDiedAction = EnemyDies;
+
+        if (UpdateEnemyCount != null)
+        {
+            UpdateEnemyCount();
+        }
 
         SetupAiPathTarget(spider);
     }
@@ -88,8 +133,22 @@ public class SpawnerBehavior : MonoBehaviour
         aiPath.target = PlayerReference.transform;
     }
 
-    void EnemyDies()
+    public void EnemyDies()
     {
-        _currentWaveCount--;
+        CurrentEnemiesLeftCount--;
+        if (UpdateEnemyCount != null)
+        {
+            UpdateEnemyCount();
+        }
+
+        if (CurrentEnemiesLeftCount <= 0)
+        {
+            Invoke("SpawnLoop", _spawnDelay);
+        }
+    }
+
+    public void SpawnFirstSpider()
+    {
+        var spider = SpiderFactoryReference.CreateNewSpider();
     }
 }

@@ -19,7 +19,7 @@ public class HealthBarBehavior : MonoBehaviour
 
     [HideInInspector]
     [SerializeField]
-    private EnemyBehavior _enemyReference;
+    private SpiderBehavior _spiderReference;
 
 
 
@@ -47,34 +47,49 @@ public class HealthBarBehavior : MonoBehaviour
         set { _healthLabel = value; }
     }
 
-    public EnemyBehavior EnemyReference
+    public SpiderBehavior SpiderReference
     {
-        get { return _enemyReference; }
-        set { _enemyReference = value; }
+        get { return _spiderReference; }
+        set { _spiderReference = value; }
     }
 
 
 
     void Start()
     {
+        GetReferencesFromSceneManager();
         InitializeReferences();
 
         HealthLabel.text = PlayerStatsReference.Health.ToString(System.Globalization.CultureInfo.InvariantCulture);
     }
 
-    private void InitializeReferences()
+    private void GetReferencesFromSceneManager()
     {
-        PlayerReference = GameObject.Find("Player").GetComponent<PlayerBehavior>();
-        if (PlayerReference == null)
+        var sceneManagerReference = GameObject.Find("SceneManager");
+        if (sceneManagerReference == null)
         {
-            throw new MissingComponentException("Missing Player Reference");
+            throw new MissingComponentException("Main Scene Manager reference not present for Spider");
         }
 
-        PlayerStatsReference = PlayerReference.GetComponent<Stats>();
-        if (PlayerStatsReference == null)
-        {
-            throw new MissingComponentException("Missing Player Stats Reference");
-        }
+        var sceneManagerBehavior = sceneManagerReference.GetComponent<SceneManagerBehavior>();
+
+        PlayerReference = sceneManagerBehavior.PlayerReference.GetComponent<PlayerBehavior>();
+        PlayerStatsReference = sceneManagerBehavior.PlayerReference.GetComponent<Stats>();
+    }
+
+    private void InitializeReferences()
+    {
+        //PlayerReference = GameObject.Find("Player").GetComponent<PlayerBehavior>();
+        //if (PlayerReference == null)
+        //{
+        //    throw new MissingComponentException("Missing Player Reference");
+        //}
+
+        //PlayerStatsReference = PlayerReference.GetComponent<Stats>();
+        //if (PlayerStatsReference == null)
+        //{
+        //    throw new MissingComponentException("Missing Player Stats Reference");
+        //}
 
         ProgressBarReference = GetComponent<UISlider>();
         if (ProgressBarReference == null)
@@ -88,8 +103,8 @@ public class HealthBarBehavior : MonoBehaviour
             throw new MissingComponentException("Missing Health Label Reference");
         }
 
-        EnemyReference = GameObject.Find("Spider").GetComponent<EnemyBehavior>();
-        if (EnemyReference == null)
+        SpiderReference = GameObject.Find("Spider").GetComponent<SpiderBehavior>();
+        if (SpiderReference == null)
         {
             throw new MissingComponentException("Missing Enemy Reference");
         }
@@ -105,7 +120,6 @@ public class HealthBarBehavior : MonoBehaviour
 
     private void UpdateHealthLabel()
     {
-        //HealthLabel.text = (PlayerStatsReference.Health  - EnemyReference.DamagePerAttack).ToString(System.Globalization.CultureInfo.InvariantCulture);
         HealthLabel.text = PlayerStatsReference.Health.ToString(System.Globalization.CultureInfo.InvariantCulture);
     }
 }

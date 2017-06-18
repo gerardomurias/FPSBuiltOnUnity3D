@@ -28,7 +28,7 @@ public class PlayerBehavior : MonoBehaviour, IHittable, IDie, IBleed
 
     [HideInInspector]
     [SerializeField]
-    private EnemyBehavior _enemyReference;
+    private SpiderBehavior _spiderReference;
 
 
 
@@ -54,13 +54,17 @@ public class PlayerBehavior : MonoBehaviour, IHittable, IDie, IBleed
         set { _audioSources = value; }
     }
 
-    public EnemyBehavior EnemyReference
+    public SpiderBehavior SpiderReference
     {
-        get { return _enemyReference; }
-        set { _enemyReference = value; }
+        get { return _spiderReference; }
+        set { _spiderReference = value; }
     }
 
 
+
+    void Awake()
+    {
+    }
 
     void Start()
     {
@@ -76,7 +80,7 @@ public class PlayerBehavior : MonoBehaviour, IHittable, IDie, IBleed
     {
         InitializeStats();
         InitializeAudioSources();
-        InitializeEnemiesReference();
+        //InitializeEnemiesReference();
     }
 
     private void InitializeEnemiesReference()
@@ -86,8 +90,8 @@ public class PlayerBehavior : MonoBehaviour, IHittable, IDie, IBleed
             throw new MissingComponentException("No Enemies Located");
         }
 
-        EnemyReference = GameObject.FindGameObjectWithTag("Spider").GetComponent<EnemyBehavior>();
-        if (EnemyReference == null)
+        SpiderReference = GameObject.FindGameObjectWithTag("Spider").GetComponent<SpiderBehavior>();
+        if (SpiderReference == null)
         {
             throw new MissingComponentException("No Enemies Located");
         }
@@ -136,7 +140,7 @@ public class PlayerBehavior : MonoBehaviour, IHittable, IDie, IBleed
 
     public void Hit()
     {
-        PlayerStats.Health -= EnemyReference.DamagePerAttack;
+        PlayerStats.Health -= SpiderReference.DamagePerAttack;
         
         if (PlayerStats.Health <= 0)
         {
