@@ -1,49 +1,39 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
-using Random = UnityEngine.Random;
+using System.Threading;
 
-public class SpawnerBehavior : MonoBehaviour
+public class SpawnerBehavior : MonoBehaviour, IChildrenInitializable
 {
     [SerializeField]
+    [HideInInspector]
     private GameObject _playerReference;
 
     [SerializeField]
     private int _currentWaveCount;
 
     [SerializeField]
-    private int _currentEnemiesLeftCount = 0;
+    [HideInInspector]
+    private GameObject _spiderFactoryGameObject;
 
     [SerializeField]
-    private SpiderFactory _spiderFactoryReference;
+    [HideInInspector]
+    private SpiderFactory _spiderFactoryBehavior;
 
-    private float _spawnOffset = 3.0f;
+    private float _spawnDelay = 5f;
 
-    private float _spawnDelay = 5;
+    private int _numberOfEnemiesPerWave = 4;
 
-    private int _enemiesIncrement = 1;
-    
     private Action _hasDied;
 
-    public Action UpdateEnemyCount;
+    public Action UpdateEnemyCountAction;
 
-    public Action UpdateWaveCount;
+    public Action UpdateWaveCountAction;
 
-    internal List<GameObject> Enemies = new List<GameObject>();
+    internal List<GameObject> Spiders = new List<GameObject>();
 
 
-
-    public Vector3 RandomSpawnPoinTransform
-    {
-        get
-        {
-            int randIndex = Random.Range(0, transform.childCount - 1);
-            var position = transform.GetChild(randIndex).position + Random.insideUnitSphere * _spawnOffset;
-            position.y = 0;
-
-            return position;
-        }
-    }
 
     public GameObject PlayerReference
     {
@@ -59,72 +49,51 @@ public class SpawnerBehavior : MonoBehaviour
 
     public int CurrentEnemiesLeftCount
     {
-        get { return _currentEnemiesLeftCount; }
-        set { _currentEnemiesLeftCount = (value < 0) ? 0 : value; }
+        get { return Spiders.Count; }
     }
 
-    public SpiderFactory SpiderFactoryReference
+    public GameObject SpiderFactoryGameObject
     {
-        get { return _spiderFactoryReference; }
-        set { _spiderFactoryReference = value; }
+        get { return _spiderFactoryGameObject; }
+        set { _spiderFactoryGameObject = value; }
+    }
+
+    public SpiderFactory SpiderFactoryBehavior
+    {
+        get { return _spiderFactoryBehavior; }
+        set { _spiderFactoryBehavior = value; }
     }
 
 
+
+    void Awake()
+    {
+
+    }
 
     void Start()
     {
+        //Instantiate first wave spiders
+        CurrentWaveCount++;
         SpawnLoop();
-    }
-
-    private void SpawnFirstSpider(GameObject enemySpider)
-    {
-        throw new NotImplementedException();
-    }
-
-    void Update()
-    {
     }
 
     private void SpawnLoop()
     {
-        //UpdateEnemiesCount();
-
-
-        //CurrentWaveCount++;
-        //if (UpdateWaveCount != null)
-        //{
-        //    UpdateWaveCount();
-        //}
-
-        //for (int i = 0; i < CurrentEnemiesLeftCount; i++)
-        //{
-        //    InstantiateNewSpider();
-        //}
-    }
-
-    private void UpdateEnemiesCount()
-    {
-        _enemiesIncrement += 1;
-        CurrentEnemiesLeftCount = _enemiesIncrement;
-    }
-
-    //private void InstantiateNewSpider()
-    //{
-    //    var spider = Instantiate(EnemySpider, RandomSpawnPoinTransform, Quaternion.identity);
-    //    SpawnInstantiatedSpider(spider);
-    //}
-
-    private void SpawnInstantiatedSpider(GameObject spider)
-    {
-        var enemyBehaviorComponent = spider.GetComponent<SpiderBehavior>();
-        enemyBehaviorComponent.HasDiedAction = EnemyDies;
-
-        if (UpdateEnemyCount != null)
+        for (var cont = 0; cont < _numberOfEnemiesPerWave; cont++)
         {
-            UpdateEnemyCount();
-        }
+            var newSpider = SpiderFactoryBehavior.CreateNewSpider();
+            var enemyBehaviorComponent = newSpider.GetComponent<SpiderBehavior>();
+            enemyBehaviorComponent.HasDiedAction = EnemyDies;
 
-        SetupAiPathTarget(spider);
+            Spiders.Add(newSpider);
+
+            UpdateEnemiesCount();
+        }
+    }
+
+    void Update()
+    {
     }
 
     private void SetupAiPathTarget(GameObject spider)
@@ -135,20 +104,78 @@ public class SpawnerBehavior : MonoBehaviour
 
     public void EnemyDies()
     {
-        CurrentEnemiesLeftCount--;
-        if (UpdateEnemyCount != null)
+        var spiderToRemove = Spiders.FirstOrDefault(x => x.GetComponent<SpiderBehavior>().SpiderStats.Health <= 0);
+
+        if (spiderToRemove != null)
         {
-            UpdateEnemyCount();
+            Spiders.Remove(spiderToRemove);
+            spiderToRemove.GetComponent<SpiderBehavior>().DestroyEnemyGameObject();
+
+            UpdateEnemiesCount();
         }
+
+        if (UpdateEnemyCountAction != null)
+        { UpdateEnemyCountAction(); }
 
         if (CurrentEnemiesLeftCount <= 0)
         {
+            UpdateNextWave();
+
             Invoke("SpawnLoop", _spawnDelay);
         }
     }
 
-    public void SpawnFirstSpider()
+    private void UpdateNextWave()
     {
-        var spider = SpiderFactoryReference.CreateNewSpider();
+        CurrentWaveCount++;
+
+        if (UpdateWaveCountAction != null)
+        {
+            UpdateWaveCountAction();
+        }
+
+        _numberOfEnemiesPerWave += 2;
+    }
+
+    public GameObject SpawnFirstSpider()
+    {
+        InitializeChildrenReferences();
+        ActivateChildrenObjects();
+
+        var spider = SpiderFactoryBehavior.SpawnFirstSpider();
+        var enemyBehaviorComponent = spider.GetComponent<SpiderBehavior>();
+        enemyBehaviorComponent.HasDiedAction = EnemyDies;
+
+        Spiders.Add(spider);
+        UpdateEnemiesCount();
+        SetupAiPathTarget(spider);
+
+        return spider;
+    }
+
+    private void UpdateEnemiesCount()
+    {
+        if (UpdateEnemyCountAction != null)
+        { UpdateEnemyCountAction(); }
+    }
+
+    public void CheckNullTransform(Transform objectTransform)
+    {
+        if (objectTransform == null)
+        { throw new MissingComponentException("Missing Reference on Spawner Class"); }
+    }
+
+    public void InitializeChildrenReferences()
+    {
+        var spiderFactoryTransform = transform.Find("SpiderFactory");
+        CheckNullTransform(spiderFactoryTransform);
+        SpiderFactoryGameObject = spiderFactoryTransform.gameObject;
+        SpiderFactoryBehavior = SpiderFactoryGameObject.GetComponent<SpiderFactory>();
+        SpiderFactoryBehavior.PlayerReference = PlayerReference;
+    }
+
+    public void ActivateChildrenObjects()
+    {
+        SpiderFactoryGameObject.SetActive(true);
     }
 }

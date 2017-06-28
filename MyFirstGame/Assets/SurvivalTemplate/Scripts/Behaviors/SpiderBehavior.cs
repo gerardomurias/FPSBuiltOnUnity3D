@@ -55,6 +55,7 @@ public class SpiderBehavior : MonoBehaviour, IHittable, IBleed, IDie, IAutomatic
     private const int _DamagePerAttack = 10;
 
 
+
     public Stats SpiderStats
     {
         get { return _spiderStats; }
@@ -114,10 +115,12 @@ public class SpiderBehavior : MonoBehaviour, IHittable, IBleed, IDie, IAutomatic
         get { return _DamagePerAttack; }
     }
 
+    void Awake()
+    {
+    }
+
     void Start()
     {
-        GetReferencesFromSceneManager();
-
         IsCharging = false;
 
         InitializeEnemyStats();
@@ -125,25 +128,6 @@ public class SpiderBehavior : MonoBehaviour, IHittable, IBleed, IDie, IAutomatic
         InitializeAudioSource();
         InitializeAnimations();
         InitalizePathFinding();
-        InitializeExternReferences();
-    }
-
-    private void GetReferencesFromSceneManager()
-    {
-        var sceneManagerReference = GameObject.Find("SceneManager");
-        if (sceneManagerReference == null)
-        {
-            throw new MissingComponentException("Main Scene Manager reference not present for Spider");
-        }
-
-        var sceneManagerBehavior = sceneManagerReference.GetComponent<SceneManagerBehavior>();
-
-
-        SpiderStats = sceneManagerBehavior.SpiderStats;
-        AudioSources = sceneManagerBehavior.SpiderAudioSources;
-        DeathAnimation = sceneManagerBehavior.SpiderAnimation;
-        AiPath = sceneManagerBehavior.PathFinding;
-        PlayerReference = sceneManagerBehavior.PlayerReference;
     }
 
     void Update()
@@ -154,13 +138,6 @@ public class SpiderBehavior : MonoBehaviour, IHittable, IBleed, IDie, IAutomatic
     private void InitializePosition()
     {
         AttackPoint = GetComponent<Transform>();
-    }
-
-    private void InitializeExternReferences()
-    {
-        PlayerReference = GameObject.Find("Player");
-
-        if (PlayerReference == null) { throw new MissingComponentException("EnemyBehavior: Missing Player reference"); }
     }
 
     private void InitalizePathFinding()
@@ -188,13 +165,7 @@ public class SpiderBehavior : MonoBehaviour, IHittable, IBleed, IDie, IAutomatic
 
     private void InitializeEnemyStats()
     {
-        var gameObjectStats = GameObject.Find("Stats");
-        if (gameObjectStats == null)
-        {
-            throw new MissingComponentException("Stats component missing in Enemy Class");
-        }
-
-        SpiderStats = gameObjectStats.GetComponent<Stats>();
+        SpiderStats = GetComponent<Stats>();
         if (SpiderStats == null)
         {
             throw new MissingComponentException("Stats component missing in Enemy Class");
@@ -221,7 +192,6 @@ public class SpiderBehavior : MonoBehaviour, IHittable, IBleed, IDie, IAutomatic
     {
         PlayDeath();
         BroadcastMessageToSpawner();
-        DestroyEnemyGameObject();
     }
 
     private void BroadcastMessageToSpawner()
@@ -232,7 +202,7 @@ public class SpiderBehavior : MonoBehaviour, IHittable, IBleed, IDie, IAutomatic
         }
     }
 
-    private void DestroyEnemyGameObject()
+    public void DestroyEnemyGameObject()
     {
         Destroy(gameObject, _deadAudioClip.length);
     }

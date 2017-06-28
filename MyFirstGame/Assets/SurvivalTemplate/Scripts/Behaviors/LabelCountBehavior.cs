@@ -41,23 +41,11 @@ namespace Assets.SurvivalTemplate.Scripts.Behaviors
 
         void Start()
         {
-            InitializeReferences();
 
-            SpawnerReference.UpdateEnemyCount = UpdateEnemiesLeftLabelCount;
         }
 
         private void InitializeReferences()
         {
-            var sceneManager = GameObject.Find("SceneManager");
-            if (sceneManager == null)
-            { throw new MissingComponentException("No Scene Manager Reference Present"); }
-
-            SpiderReference = sceneManager.GetComponent<SpiderBehavior>();
-            if (SpiderReference == null)
-            {
-                throw new MissingComponentException("Missing Enemy Reference");
-            }
-
             EnemiesLeftLabelReference = GetComponent<UILabel>();
             if (EnemiesLeftLabelReference == null)
             {
@@ -65,8 +53,10 @@ namespace Assets.SurvivalTemplate.Scripts.Behaviors
             }
         }
 
-        private void UpdateEnemiesLeftLabelCount()
+        public void UpdateEnemiesLeftLabelCount()
         {
+            InitializeReferences();
+
             EnemiesLeftLabelReference.text = _enemiesLeftLiteral + SpawnerReference.CurrentEnemiesLeftCount;
         }
     }

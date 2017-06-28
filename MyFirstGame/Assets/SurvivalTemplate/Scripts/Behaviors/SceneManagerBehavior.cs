@@ -1,39 +1,35 @@
-﻿using System.Linq;
-using System.Threading;
+﻿using Assets.SurvivalTemplate.Scripts.Behaviors;
 using UnityEngine;
 
-public class SceneManagerBehavior : MonoBehaviour
+public class SceneManagerBehavior : MonoBehaviour, IChildrenInitializable
 {
     [SerializeField]
-    private SpawnerBehavior _spawnerReference;
+    [HideInInspector]
+    private GameObject _spawnerReference;
 
     [SerializeField]
+    [HideInInspector]
     private GameObject _playerReference;
 
     [SerializeField]
-    private Stats _spiderStats;
+    [HideInInspector]
+    private GameObject _astarPathReference;
 
     [SerializeField]
-    private AudioSource[] _spiderAudioSources;
+    [HideInInspector]
+    private GameObject _uiSliderReference;
 
     [SerializeField]
-    private Animation _spiderAnimation;
+    [HideInInspector]
+    private GameObject _waveCountReference;
 
     [SerializeField]
-    private AIPath _pathFinding;
-
-    [SerializeField]
-    private UISlider _progressBarReference;
-
-    [SerializeField]
-    private SpiderBehavior _spiderReference;
-
-    [SerializeField]
-    private SpiderFactory _spiderFactoryReference;
+    [HideInInspector]
+    private GameObject _enemiesCountReference;
 
 
 
-    public SpawnerBehavior SpawnerReference
+    public GameObject SpawnerReference
     {
         get { return _spawnerReference; }
         set { _spawnerReference = value; }
@@ -45,64 +41,91 @@ public class SceneManagerBehavior : MonoBehaviour
         set { _playerReference = value; }
     }
 
-    public Stats SpiderStats
+    public GameObject AstarPathReference
     {
-        get { return _spiderStats; }
-        set { _spiderStats = value; }
+        get { return _astarPathReference; }
+        set { _astarPathReference = value; }
     }
 
-    public AudioSource[] SpiderAudioSources
+    public GameObject UiSliderReference
     {
-        get { return _spiderAudioSources; }
-        set { _spiderAudioSources = value; }
+        get { return _uiSliderReference; }
+        set { _uiSliderReference = value; }
     }
 
-    public Animation SpiderAnimation
+    public GameObject WaveCountReference
     {
-        get { return _spiderAnimation; }
-        set { _spiderAnimation = value; }
+        get { return _waveCountReference; }
+        set { _waveCountReference = value; }
     }
 
-    public AIPath PathFinding
+    public GameObject EnemiesCountReference
     {
-        get { return _pathFinding; }
-        set { _pathFinding = value; }
+        get { return _enemiesCountReference; }
+        set { _enemiesCountReference = value; }
     }
 
-    public UISlider ProgressBarReference
-    {
-        get { return _progressBarReference; }
-        set { _progressBarReference = value; }
-    }
 
-    public SpiderBehavior SpiderReference
-    {
-        get { return _spiderReference; }
-        set { _spiderReference = value; }
-    }
-
-    public SpiderFactory SpiderFactoryReference
-    {
-        get { return _spiderFactoryReference; }
-        set { _spiderFactoryReference = value; }
-    }
 
     void Awake()
     {
-        InitializeReferences();
-        CallToStartSpawningEnemies();
+        InitializeChildrenReferences();
+        ActivateChildrenObjects();
     }
 
-    private void InitializeReferences()
+    public void ActivateChildrenObjects()
     {
-        SpiderFactoryReference = GetComponent<SpiderFactory>();
-        if (SpiderFactoryReference == null)
-        { throw new MissingComponentException("No Spider Factory Reference Present"); }
+        SpawnerReference.SetActive(true);
+        PlayerReference.SetActive(true);
+        AstarPathReference.SetActive(true);
+        UiSliderReference.SetActive(true);
+        WaveCountReference.SetActive(true);
+        EnemiesCountReference.SetActive(true);
     }
 
-    private void CallToStartSpawningEnemies()
+    public void InitializeChildrenReferences()
     {
-        SpawnerReference.SpawnFirstSpider();
-        SpiderReference = SpawnerReference.Enemies[0].GetComponent<SpiderBehavior>();
+        var playerTransform = transform.Find("Player");
+        CheckNullTransform(playerTransform);
+        PlayerReference = playerTransform.gameObject;
+
+        var spawnerTransform = transform.Find("Spawner");
+        CheckNullTransform(spawnerTransform);
+        SpawnerReference = spawnerTransform.gameObject;
+
+        var astarPathTransform = transform.FindDeepChild("A*");
+        CheckNullTransform(astarPathTransform);
+        AstarPathReference = astarPathTransform.gameObject;
+
+        var uiSliderTransform = transform.FindDeepChild("Progress Bar");
+        CheckNullTransform(uiSliderTransform);
+        UiSliderReference = uiSliderTransform.gameObject;
+
+        var waveCountTransform = transform.FindDeepChild("WaveCountLabel");
+        CheckNullTransform(waveCountTransform);
+        WaveCountReference = waveCountTransform.gameObject;
+
+        var enemiesCountTransform = transform.FindDeepChild("EnemiesCountLabel");
+        CheckNullTransform(enemiesCountTransform);
+        EnemiesCountReference = enemiesCountTransform.gameObject;
+
+        var playerBehavior = PlayerReference.GetComponent<PlayerBehavior>();
+        var spawnerBehavior = SpawnerReference.GetComponent<SpawnerBehavior>();
+        var healthBarBehavior = UiSliderReference.GetComponent<HealthBarBehavior>();
+        var labelCountBehavior = EnemiesCountReference.GetComponent<LabelCountBehavior>();
+        var waveCountBehavior = WaveCountReference.GetComponent<WaveCountLabelBehavior>();
+
+        spawnerBehavior.UpdateEnemyCountAction = labelCountBehavior.UpdateEnemiesLeftLabelCount;
+        spawnerBehavior.UpdateWaveCountAction = waveCountBehavior.UpdateWaveLabelCount;
+
+        playerBehavior.SpiderReference = spawnerBehavior.SpawnFirstSpider().GetComponent<SpiderBehavior>();
+        spawnerBehavior.PlayerReference = PlayerReference;
+        healthBarBehavior.PlayerReference = PlayerReference.GetComponent<PlayerBehavior>();
+    }
+
+    public void CheckNullTransform(Transform objectTransform)
+    {
+        if (objectTransform == null)
+        { throw new MissingComponentException("Missing Reference on Scene Manager"); }
     }
 }

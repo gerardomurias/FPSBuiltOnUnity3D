@@ -26,19 +26,23 @@ public class WaveCountLabelBehavior : MonoBehaviour
         set { _waveCountLabelReference = value; }
     }
 
-    // Use this for initialization
+
+
     void Start()
     {
-        InitializeReferences();
-
-        SpawnerReference.UpdateWaveCount = UpdateWaveLabelCount;
+        //SpawnerReference.UpdateWaveCountAction = UpdateWaveLabelCount;
         UpdateWaveLabelCount();
     }
 
-    
-
-    private void UpdateWaveLabelCount()
+    void Update()
     {
+
+    }
+
+    public void UpdateWaveLabelCount()
+    {
+        InitializeReferences();
+
         WaveCountLabelReference.text = _waveCountLabelLiteral + SpawnerReference.CurrentWaveCount;
     }
 
@@ -51,8 +55,4 @@ public class WaveCountLabelBehavior : MonoBehaviour
         }
     }
 
-    void Update()
-    {
-
-    }
 }
