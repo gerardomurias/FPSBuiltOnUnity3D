@@ -56,6 +56,25 @@ public class AxeBehavior : MonoBehaviour, IAttacker
 
     public void Attack()
     {
+        CheckSpiderIsReached();
+        CheckHittableObjectIsReached();
+    }
+
+    private void CheckHittableObjectIsReached()
+    {
+        var objectHits = Physics.OverlapSphere(AttackPoint.position, 0.8f).Where(x => x.GetComponent<HittableThing>());
+
+        if (objectHits.Any())
+        {
+            foreach (IHittable hitable in objectHits.Select(x => x.GetComponents(typeof(IHittable))).First())
+            {
+                hitable.Hit();
+            }
+        }
+    }
+
+    private void CheckSpiderIsReached()
+    {
         var hits = Physics.OverlapSphere(AttackPoint.position, 0.8f).Where(x => x.gameObject.name.Contains("Spider"));
 
         if (hits.Any())

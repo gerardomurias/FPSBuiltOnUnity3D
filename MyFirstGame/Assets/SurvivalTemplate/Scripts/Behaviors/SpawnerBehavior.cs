@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using System.Threading;
+using UnityEngine.SceneManagement;
 
 public class SpawnerBehavior : MonoBehaviour, IChildrenInitializable
 {
@@ -34,6 +35,8 @@ public class SpawnerBehavior : MonoBehaviour, IChildrenInitializable
     public Action UpdateScoreAction;
 
     internal List<GameObject> Spiders = new List<GameObject>();
+
+    private int _numberOfWavesPerWin = 5;
 
 
 
@@ -134,12 +137,19 @@ public class SpawnerBehavior : MonoBehaviour, IChildrenInitializable
     {
         CurrentWaveCount++;
 
-        if (UpdateWaveCountAction != null)
+        if (CurrentWaveCount < _numberOfWavesPerWin)
         {
-            UpdateWaveCountAction();
-        }
+            if (UpdateWaveCountAction != null)
+            {
+                UpdateWaveCountAction();
+            }
 
-        _numberOfEnemiesPerWave += 2;
+            _numberOfEnemiesPerWave += 2;
+        }
+        else
+        {
+            SceneManager.LoadSceneAsync("FinalWin", LoadSceneMode.Single);
+        }
     }
 
     public GameObject SpawnFirstSpider()
