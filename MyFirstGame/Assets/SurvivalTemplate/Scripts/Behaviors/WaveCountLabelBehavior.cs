@@ -30,7 +30,6 @@ public class WaveCountLabelBehavior : MonoBehaviour
 
     void Start()
     {
-        //SpawnerReference.UpdateWaveCountAction = UpdateWaveLabelCount;
         UpdateWaveLabelCount();
     }
 

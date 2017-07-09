@@ -31,6 +31,8 @@ public class SpawnerBehavior : MonoBehaviour, IChildrenInitializable
 
     public Action UpdateWaveCountAction;
 
+    public Action UpdateScoreAction;
+
     internal List<GameObject> Spiders = new List<GameObject>();
 
 
@@ -116,6 +118,9 @@ public class SpawnerBehavior : MonoBehaviour, IChildrenInitializable
 
         if (UpdateEnemyCountAction != null)
         { UpdateEnemyCountAction(); }
+
+        if (UpdateScoreAction != null)
+        { UpdateScoreAction(); }
 
         if (CurrentEnemiesLeftCount <= 0)
         {

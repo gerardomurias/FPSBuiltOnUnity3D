@@ -27,6 +27,9 @@ public class SceneManagerBehavior : MonoBehaviour, IChildrenInitializable
     [HideInInspector]
     private GameObject _enemiesCountReference;
 
+    [SerializeField]
+    [HideInInspector]
+    private GameObject _scoreReference;
 
 
     public GameObject SpawnerReference
@@ -65,7 +68,11 @@ public class SceneManagerBehavior : MonoBehaviour, IChildrenInitializable
         set { _enemiesCountReference = value; }
     }
 
-
+    public GameObject ScoreReference
+    {
+        get { return _scoreReference; }
+        set { _scoreReference = value; }
+    }
 
     void Awake()
     {
@@ -81,6 +88,7 @@ public class SceneManagerBehavior : MonoBehaviour, IChildrenInitializable
         UiSliderReference.SetActive(true);
         WaveCountReference.SetActive(true);
         EnemiesCountReference.SetActive(true);
+        ScoreReference.SetActive(true);
     }
 
     public void InitializeChildrenReferences()
@@ -109,14 +117,20 @@ public class SceneManagerBehavior : MonoBehaviour, IChildrenInitializable
         CheckNullTransform(enemiesCountTransform);
         EnemiesCountReference = enemiesCountTransform.gameObject;
 
+        var scoreTransform = transform.FindDeepChild("ScoreLabel");
+        CheckNullTransform(scoreTransform);
+        ScoreReference = scoreTransform.gameObject;
+
         var playerBehavior = PlayerReference.GetComponent<PlayerBehavior>();
         var spawnerBehavior = SpawnerReference.GetComponent<SpawnerBehavior>();
         var healthBarBehavior = UiSliderReference.GetComponent<HealthBarBehavior>();
         var labelCountBehavior = EnemiesCountReference.GetComponent<LabelCountBehavior>();
         var waveCountBehavior = WaveCountReference.GetComponent<WaveCountLabelBehavior>();
+        var scoreBehavior = ScoreReference.GetComponent<LabelScoreBehavior>();
 
         spawnerBehavior.UpdateEnemyCountAction = labelCountBehavior.UpdateEnemiesLeftLabelCount;
         spawnerBehavior.UpdateWaveCountAction = waveCountBehavior.UpdateWaveLabelCount;
+        spawnerBehavior.UpdateScoreAction = scoreBehavior.UpdateScoreLabel;
 
         playerBehavior.SpiderReference = spawnerBehavior.SpawnFirstSpider().GetComponent<SpiderBehavior>();
         spawnerBehavior.PlayerReference = PlayerReference;
