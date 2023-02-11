@@ -13,5 +13,3 @@ Software Development First Person Shooter developed on Unity3D. Meant to test C#
   - Façade
   - Iterator
   - Strategy
-
-Thanks to PluralSight for 3d Resources and WalkThrough.
